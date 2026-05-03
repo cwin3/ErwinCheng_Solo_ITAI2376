@@ -13,12 +13,12 @@ tools = [
     Tool(
         name="Car Search",
         func=search_cars,
-        description="Search for car listings based on user query"
+        description="Search for car listings"
     ),
     Tool(
         name="Price Analysis",
         func=lambda x: str(price_analysis(search_cars(x))),
-        description="Analyze if a car is a good deal"
+        description="Analyze car deals"
     )
 ]
 
@@ -29,7 +29,7 @@ memory = ConversationBufferMemory(return_messages=True)
 agent = initialize_agent(
     tools=tools,
     llm=llm,
-    agent="chat-conversational-react-description",
+    agent="zero-shot-react-description",  # 🔥 IMPORTANT FIX
     memory=memory,
     verbose=True
 )
