@@ -1,4 +1,6 @@
-from src.agent import run_agent
+# Optional CLI version
+from src.agent import agent
 
-if __name__ == "__main__":
-    run_agent()
+while True:
+    q = input("Ask: ")
+    print(agent.run(q))
