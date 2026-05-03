@@ -1,28 +1,34 @@
-from langchain.agents import initialize_agent, Tool
-from langchain.chat_models import ChatOpenAI
+from langchain.agents import initialize_agent
+from langchain.tools import Tool
+from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
+
 from src.tools import search_cars, price_analysis
 
+# LLM
 llm = ChatOpenAI(temperature=0)
 
+# Tools
 tools = [
     Tool(
         name="Car Search",
         func=search_cars,
-        description="Search car listings"
+        description="Search for car listings based on user query"
     ),
     Tool(
         name="Price Analysis",
         func=lambda x: str(price_analysis(search_cars(x))),
-        description="Analyze deals"
+        description="Analyze if a car is a good deal"
     )
 ]
 
-memory = ConversationBufferMemory()
+# Memory
+memory = ConversationBufferMemory(return_messages=True)
 
+# Agent
 agent = initialize_agent(
-    tools,
-    llm,
+    tools=tools,
+    llm=llm,
     agent="chat-conversational-react-description",
     memory=memory,
     verbose=True
