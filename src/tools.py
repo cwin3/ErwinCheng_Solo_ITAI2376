@@ -10,11 +10,10 @@ def load_data():
 
     return df.to_dict(orient="records")
 
-
 def filter_cars(cars, query, max_price, fuel):
     query = query.lower()
-
     results = []
+
     for c in cars:
         if c["price"] > max_price:
             continue
@@ -25,7 +24,6 @@ def filter_cars(cars, query, max_price, fuel):
         results.append(c)
 
     return results
-
 
 def analyze_cars(cars):
     for c in cars:
