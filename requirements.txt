@@ -1,5 +1,6 @@
-langchain
-openai
-python-dotenv
 streamlit
+langchain
+langchain-openai
+openai
 requests
+python-dotenv
