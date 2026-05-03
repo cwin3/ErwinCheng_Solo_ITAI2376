@@ -10,15 +10,14 @@ if "favorites" not in st.session_state:
 
 cars_data = load_data()
 
-# ---------- SIDEBAR ----------
+# Sidebar
 st.sidebar.title("Filters")
-
 budget = st.sidebar.slider("Max Price", 5000, 80000, 25000)
-fuel = st.sidebar.selectbox("Fuel", ["Any","gas","hybrid","electric"])
-sort_by = st.sidebar.radio("Sort", ["Best","Cheapest","Newest"])
+fuel = st.sidebar.selectbox("Fuel Type", ["Any","gas","hybrid","electric"])
+sort_by = st.sidebar.radio("Sort By", ["Best","Cheapest","Newest"])
 
-# ---------- SEARCH ----------
-query = st.text_input("Search cars")
+# Search
+query = st.text_input("Search cars (e.g. Toyota, BMW)")
 
 if query:
     cars = filter_cars(cars_data, query, budget, fuel)
@@ -31,46 +30,53 @@ if query:
     else:
         cars.sort(key=lambda x: x["year"], reverse=True)
 
+    st.markdown("## Results")
     cols = st.columns(3)
 
     for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
             st.image(c["image"])
             st.write(f"**{c['model']} ({c['year']})**")
-            st.write(f"${c['price']}")
-            st.write(f"{c['mileage']} miles")
-            st.write(c["dealer"])
+            st.write(f"${c['price']:,}")
+            st.write(f"{c['mileage']:,} miles")
+            st.write(f"{c['dealer']}")
 
             if c["is_suspicious"]:
-                st.error("Suspicious listing")
+                st.error("⚠️ Suspicious listing")
             elif c["score"] > 70:
-                st.success(f"Excellent ({c['score']})")
+                st.success(f"Excellent Deal ({c['score']})")
+            elif c["score"] > 50:
+                st.warning(f"Good Deal ({c['score']})")
             else:
-                st.warning(f"Score: {c['score']}")
+                st.warning(f"Overpriced ({c['score']})")
 
-            if st.button("Save", key=i):
+            if st.button("❤️ Save", key=f"save_{i}"):
                 st.session_state.favorites.append(c)
 
-# ---------- COMPARE ----------
+# Compare
 st.markdown("---")
-st.write("Compare")
+st.markdown("## Compare")
 
 if len(st.session_state.favorites) >= 2:
     cols = st.columns(len(st.session_state.favorites[:3]))
-    for i,c in enumerate(st.session_state.favorites[:3]):
+    for i, c in enumerate(st.session_state.favorites[:3]):
         with cols[i]:
             st.image(c["image"])
             st.write(c["model"])
-            st.write(c["price"])
+            st.write(f"${c['price']:,}")
 
-# ---------- AI ----------
+# AI Assistant
 st.markdown("---")
-chat = st.text_input("Ask AI")
+st.markdown("## Ask AI")
+
+chat = st.text_input("Ask about cars...")
 
 if chat:
-    st.write(ask_ollama(chat))
+    response = ask_ollama(chat)
+    st.write(response)
 
-# ---------- INSIGHTS ----------
-if query:
+# Insights
+if query and len(cars) > 0:
     df = pd.DataFrame(cars)
-    st.write("Avg Price:", int(df["price"].mean()))
+    st.markdown("## Market Insights")
+    st.write("Average Price:", int(df["price"].mean()))
