@@ -1,29 +1,25 @@
 from langchain.agents import initialize_agent, Tool
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
-from tools import search_cars, price_analysis
+from src.tools import search_cars, price_analysis
 
-# LLM
 llm = ChatOpenAI(temperature=0)
 
-# Tools
 tools = [
     Tool(
-        name="Car Search Tool",
+        name="Car Search",
         func=search_cars,
-        description="Search for car listings based on user preferences like price, location, and type"
+        description="Search car listings"
     ),
     Tool(
-        name="Price Analysis Tool",
-        func=price_analysis,
-        description="Analyze if a car is a good deal based on price, mileage, and market trends"
+        name="Price Analysis",
+        func=lambda x: str(price_analysis(search_cars(x))),
+        description="Analyze deals"
     )
 ]
 
-# Memory
-memory = ConversationBufferMemory(memory_key="chat_history")
+memory = ConversationBufferMemory()
 
-# Agent (ReAct style)
 agent = initialize_agent(
     tools,
     llm,
@@ -31,12 +27,3 @@ agent = initialize_agent(
     memory=memory,
     verbose=True
 )
-
-def run_agent():
-    print("🚗 Smart Car Buying Assistant")
-    while True:
-        query = input("\nEnter your request (or type 'exit'): ")
-        if query.lower() == "exit":
-            break
-        response = agent.run(query)
-        print("\nAgent:", response)
