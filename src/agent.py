@@ -1,12 +1,12 @@
 from langchain.agents import initialize_agent
 from langchain.tools import Tool
-from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
+from langchain_community.chat_models import ChatOllama
 
 from src.tools import search_cars, price_analysis
 
-# LLM
-llm = ChatOpenAI(temperature=0)
+# Local LLM via Ollama
+llm = ChatOllama(model="llama3")
 
 # Tools
 tools = [
@@ -29,7 +29,7 @@ memory = ConversationBufferMemory(return_messages=True)
 agent = initialize_agent(
     tools=tools,
     llm=llm,
-    agent="zero-shot-react-description",  # 🔥 IMPORTANT FIX
+    agent="zero-shot-react-description",
     memory=memory,
     verbose=True
 )
