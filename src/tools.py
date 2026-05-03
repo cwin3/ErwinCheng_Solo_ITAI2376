@@ -1,31 +1,44 @@
-import requests
+import pandas as pd
+import streamlit as st
 
-fallback = [
-    {"model":"Toyota Camry","price":18000,"mileage":50000,"image":"https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"},
-    {"model":"Honda Civic","price":15000,"mileage":40000,"image":"https://cdn.pixabay.com/photo/2013/07/13/10/07/car-156309_1280.png"},
-    {"model":"Ford Escape","price":22000,"mileage":30000,"image":"https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49279_1280.jpg"},
-]
+@st.cache_data
+def load_data():
+    df = pd.read_csv("data/cars.csv")
 
-def search_cars(query):
-    try:
-        url = "https://cars-by-api-ninjas.p.rapidapi.com/v1/cars"
-        headers = {"X-RapidAPI-Key":"YOUR_KEY"}
-        res = requests.get(url, headers=headers, params={"model":"toyota"})
-        data = res.json()
+    df["model"] = df["manufacturer"] + " " + df["model"]
+    df["mileage"] = df["odometer"]
 
-        cars = []
-        for item in data[:5]:
-            cars.append({
-                "model": item["model"],
-                "price": 20000,
-                "mileage": 40000,
-                "image": fallback[0]["image"]
-            })
-        return cars
-    except:
-        return fallback
+    return df.to_dict(orient="records")
 
-def price_analysis(cars):
+
+def filter_cars(cars, query, max_price, fuel):
+    query = query.lower()
+
+    results = []
     for c in cars:
-        c["score"] = round(100 - (c["price"]/1000) - (c["mileage"]/2000),1)
+        if c["price"] > max_price:
+            continue
+        if query and query not in c["model"].lower():
+            continue
+        if fuel != "Any" and c["fuel"] != fuel:
+            continue
+        results.append(c)
+
+    return results
+
+
+def analyze_cars(cars):
+    for c in cars:
+        score = 100 - (c["price"]/1000) - (c["mileage"]/2000)
+
+        if c["listing_type"] == "great_deal":
+            score += 15
+        elif c["listing_type"] == "overpriced":
+            score -= 15
+        elif c["listing_type"] == "fraud":
+            score -= 40
+
+        c["score"] = round(score, 1)
+        c["is_suspicious"] = c["listing_type"] == "fraud"
+
     return cars
