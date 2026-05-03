@@ -1,124 +1,76 @@
 import streamlit as st
-from src.agent import agent
-from src.tools import search_cars, price_analysis
+from src.tools import load_data, filter_cars, analyze_cars
+from src.ollama_agent import ask_ollama
+import pandas as pd
 
-# ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="Car Finder", layout="wide")
 
-# ---------- LOGIN ----------
-USERS = {"erwin": "1234"}
-
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-
-if not st.session_state.logged_in:
-    st.title("🔐 Login")
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
-
-    if st.button("Login"):
-        if USERS.get(user) == pwd:
-            st.session_state.logged_in = True
-            st.rerun()
-        else:
-            st.error("Invalid login")
-    st.stop()
-
-# ---------- STATE ----------
 if "favorites" not in st.session_state:
     st.session_state.favorites = []
 
-# ---------- STYLE ----------
-st.markdown("""
-<style>
-.card {
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    border:1px solid #ddd;
-}
-.card:hover {box-shadow:0 4px 15px rgba(0,0,0,0.1);}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------- HEADER ----------
-st.markdown("<h1 style='text-align:center;'>🚗 Car Finder</h1>", unsafe_allow_html=True)
+cars_data = load_data()
 
 # ---------- SIDEBAR ----------
 st.sidebar.title("Filters")
-budget = st.sidebar.slider("Max Price", 5000, 50000, 20000)
-sort_by = st.sidebar.radio("Sort By", ["Best Deal", "Cheapest", "Newest"])
 
-st.sidebar.markdown("## ❤️ Favorites")
-for fav in st.session_state.favorites:
-    st.sidebar.write(f"{fav['model']} - ${fav['price']}")
+budget = st.sidebar.slider("Max Price", 5000, 80000, 25000)
+fuel = st.sidebar.selectbox("Fuel", ["Any","gas","hybrid","electric"])
+sort_by = st.sidebar.radio("Sort", ["Best","Cheapest","Newest"])
 
 # ---------- SEARCH ----------
-query = st.text_input("Search cars (e.g. SUV under 20k)")
+query = st.text_input("Search cars")
 
 if query:
-    cars = search_cars(query)
-    cars = price_analysis(cars)
+    cars = filter_cars(cars_data, query, budget, fuel)
+    cars = analyze_cars(cars)
 
-    # Filter
-    cars = [c for c in cars if c["price"] <= budget]
-
-    # Sort
-    if sort_by == "Best Deal":
+    if sort_by == "Best":
         cars.sort(key=lambda x: x["score"], reverse=True)
     elif sort_by == "Cheapest":
         cars.sort(key=lambda x: x["price"])
     else:
-        cars.sort(key=lambda x: x["mileage"])
-
-    st.markdown("## 🚗 Results")
+        cars.sort(key=lambda x: x["year"], reverse=True)
 
     cols = st.columns(3)
 
-    for i, car in enumerate(cars[:6]):
+    for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.image(car["image"], use_container_width=True)
-            st.markdown(f"### {car['model']}")
-            st.write(f"${car['price']}")
-            st.write(f"{car['mileage']} miles")
+            st.image(c["image"])
+            st.write(f"**{c['model']} ({c['year']})**")
+            st.write(f"${c['price']}")
+            st.write(f"{c['mileage']} miles")
+            st.write(c["dealer"])
 
-            score = car["score"]
-            if score > 70:
-                st.success(f"Excellent Deal ({score})")
-            elif score > 50:
-                st.warning(f"Good Deal ({score})")
+            if c["is_suspicious"]:
+                st.error("Suspicious listing")
+            elif c["score"] > 70:
+                st.success(f"Excellent ({c['score']})")
             else:
-                st.error(f"Overpriced ({score})")
+                st.warning(f"Score: {c['score']}")
 
-            if st.button("❤️ Save", key=f"save{i}"):
-                st.session_state.favorites.append(car)
-
-            st.markdown("</div>", unsafe_allow_html=True)
+            if st.button("Save", key=i):
+                st.session_state.favorites.append(c)
 
 # ---------- COMPARE ----------
 st.markdown("---")
-st.markdown("## ⚖️ Compare")
+st.write("Compare")
 
 if len(st.session_state.favorites) >= 2:
     cols = st.columns(len(st.session_state.favorites[:3]))
-    for i, car in enumerate(st.session_state.favorites[:3]):
+    for i,c in enumerate(st.session_state.favorites[:3]):
         with cols[i]:
-            st.image(car["image"])
-            st.write(car["model"])
-            st.write(f"${car['price']}")
-            st.write(f"{car['mileage']} miles")
-            st.write(f"Score: {car.get('score')}")
-else:
-    st.info("Add at least 2 favorites to compare")
+            st.image(c["image"])
+            st.write(c["model"])
+            st.write(c["price"])
 
-# ---------- CHAT ----------
+# ---------- AI ----------
 st.markdown("---")
-st.markdown("## 💬 Ask AI")
-
-chat = st.text_input("Ask about cars...")
+chat = st.text_input("Ask AI")
 
 if chat:
-    with st.spinner("Thinking..."):
-        response = agent.run(chat)
-    st.write(response)
+    st.write(ask_ollama(chat))
+
+# ---------- INSIGHTS ----------
+if query:
+    df = pd.DataFrame(cars)
+    st.write("Avg Price:", int(df["price"].mean()))
