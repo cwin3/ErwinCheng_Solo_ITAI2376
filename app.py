@@ -7,12 +7,7 @@ st.set_page_config(layout="wide")
 
 st.markdown("""
 <style>
-.card {
-    background:white;
-    border-radius:18px;
-    padding:20px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.1);
-}
+.card {background:white;border-radius:18px;padding:20px;margin-bottom:20px;}
 .price {font-size:26px;font-weight:700;}
 .subtle {color:#777;}
 </style>
@@ -30,7 +25,7 @@ with col2:
 with col3:
     sort_by = st.selectbox("Sort",["Best","Cheapest","Newest"])
 
-query = st.text_input("Search")
+query = st.text_input("Search cars")
 
 cars=[]
 
@@ -48,11 +43,11 @@ if query:
 
     for i,c in enumerate(cars[:9]):
         with cols[i%3]:
-            st.image(c["images"][0])
+            st.image(c["images"][0], use_container_width=True)
             st.markdown(f"### {c['model']} {c['year']}")
-            st.markdown(f"<div class='price'>${c['price']:,}</div>",unsafe_allow_html=True)
-            st.markdown(f"<div class='subtle'>{c['mileage']:,} miles</div>",unsafe_allow_html=True)
-            st.image(c["dealer_logo"],width=80)
+            st.markdown(f"<div class='price'>${c['price']:,}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='subtle'>{c['mileage']:,} miles</div>", unsafe_allow_html=True)
+            st.image(c["dealer_logo"], width=80)
 
 if query and cars:
     df=pd.DataFrame(cars)
