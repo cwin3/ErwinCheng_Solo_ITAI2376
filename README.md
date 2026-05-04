@@ -8,7 +8,7 @@ AI-powered car marketplace simulation using a local LLM (Ollama).
 
 This project simulates an AI agent using decision scoring inspired by machine learning models.
 
---
+---
 
 ## Features
 - 10,000 realistic car listings
