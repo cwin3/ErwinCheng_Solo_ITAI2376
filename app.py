@@ -1,9 +1,25 @@
 import streamlit as st
 from src.tools import load_data, filter_cars, analyze_cars
 from src.ollama_agent import ask_ollama
+from generated_dataset import generate_dataset
 import pandas as pd
 
 st.set_page_config(layout="wide")
+
+# ---------- SAFE IMAGE FUNCTION ----------
+def get_safe_image(c):
+    fallback = "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"
+    image = c.get("images")
+
+    if isinstance(image, list) and len(image) > 0:
+        first = image[0]
+        if isinstance(first, str) and first.startswith("http"):
+            return first
+
+    if isinstance(image, str) and image.startswith("http"):
+        return image
+
+    return fallback
 
 # ---------- STYLE ----------
 st.markdown("""
@@ -15,6 +31,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🚗 Find Your Next Car")
+
+# ---------- GENERATE DATA BUTTON ----------
+if st.button("🔄 Generate New Listings"):
+    generate_dataset()
+    st.cache_data.clear()
+    st.success("New dataset generated!")
+    st.rerun()
 
 # ---------- LOAD DATA ----------
 cars_data = load_data()
@@ -54,10 +77,25 @@ with col4:
 
 query = st.text_input("Search cars (optional)")
 
+# ---------- SEARCH STATE ----------
+if "search_clicked" not in st.session_state:
+    st.session_state.search_clicked = False
+
+colA, colB = st.columns([1, 1])
+
+with colA:
+    if st.button("🔍 Search"):
+        st.session_state.search_clicked = True
+
+with colB:
+    if st.button("❌ Reset"):
+        st.session_state.search_clicked = False
+        st.rerun()
+
 cars = []
 
 # ---------- FILTER ----------
-if query or selected_brand != "All" or selected_model != "All":
+if st.session_state.search_clicked:
     cars = filter_cars(
         cars_data,
         query,
@@ -74,21 +112,8 @@ if query or selected_brand != "All" or selected_model != "All":
     for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
 
-            # ---------- ✅ SAFE IMAGE FIX (THIS FIXES YOUR ERROR) ----------
-            image = c.get("images")
-
-            if (
-                isinstance(image, list)
-                and len(image) > 0
-                and isinstance(image[0], str)
-                and image[0].startswith("http")
-            ):
-                st.image(image[0], use_container_width=True)
-            else:
-                st.image(
-                    "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg",
-                    use_container_width=True
-                )
+            # ---------- SAFE IMAGE ----------
+            st.image(get_safe_image(c), use_container_width=True)
 
             # ---------- TEXT ----------
             st.markdown(f"### {c.get('model','Unknown')} {c.get('year','')}")
