@@ -2,7 +2,13 @@
 
 # Smart Car Buying Assistant
 
+## Objective
+
 AI-powered car marketplace simulation using a local LLM (Ollama).
+
+This project simulates an AI agent using decision scoring inspired by machine learning models.
+
+--
 
 ## Features
 - 10,000 realistic car listings
@@ -17,7 +23,7 @@ python generated_dataset.py
 ollama run llama3
 streamlit run app.py
 
-This project simulates an AI agent using decision scoring inspired by machine learning models.
+
 ## Deep Learning Connection
 
 This project is designed to simulate how AI systems help people make better decisions when buying a car.
