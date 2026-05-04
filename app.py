@@ -32,13 +32,6 @@ st.markdown("""
 
 st.title("🚗 Find Your Next Car")
 
-# ---------- GENERATE DATA BUTTON ----------
-if st.button("🔄 Generate New Listings"):
-    generate_dataset()
-    st.cache_data.clear()
-    st.success("New dataset generated!")
-    st.rerun()
-
 # ---------- LOAD DATA ----------
 cars_data = load_data()
 
