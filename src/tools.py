@@ -11,7 +11,7 @@ def load_data():
 
     df = pd.read_csv("data/cars.csv")
 
-    # ✅ FALLBACK HANDLING (CRITICAL FIX)
+    # ---------- IMAGE FALLBACK ----------
     if "images" in df.columns:
         df["images"] = df["images"].apply(ast.literal_eval)
     elif "image" in df.columns:
@@ -19,6 +19,7 @@ def load_data():
     else:
         df["images"] = [["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]] * len(df)
 
+    # ---------- DEALER LOGO FALLBACK ----------
     if "dealer_logo" not in df.columns:
         df["dealer_logo"] = "https://cdn-icons-png.flaticon.com/512/743/743007.png"
 
@@ -27,14 +28,30 @@ def load_data():
 
     return df.to_dict(orient="records")
 
-def filter_cars(cars, query, max_price, fuel):
+def filter_cars(cars, query, max_price, fuel, brand=None, model=None):
     query = query.lower()
-    return [
-        c for c in cars
-        if c["price"] <= max_price
-        and query in c["model"].lower()
-        and (fuel == "Any" or c["fuel"] == fuel)
-    ]
+
+    results = []
+
+    for c in cars:
+        if c["price"] > max_price:
+            continue
+
+        if brand and brand != "All" and c["manufacturer"] != brand:
+            continue
+
+        if model and model != "All" and c["model"] != model:
+            continue
+
+        if query and query not in c["model"].lower():
+            continue
+
+        if fuel != "Any" and c["fuel"] != fuel:
+            continue
+
+        results.append(c)
+
+    return results
 
 def analyze_cars(cars):
     for c in cars:
