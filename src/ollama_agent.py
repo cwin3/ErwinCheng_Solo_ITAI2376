@@ -4,10 +4,10 @@ def ask_ollama(prompt):
 
 Query: "{prompt}"
 
-• Compare similar vehicles  
-• Avoid unusually low prices  
+• Compare similar cars  
+• Avoid suspiciously low prices  
 • Check mileage vs year  
-• Inspect before buying  
+• Always inspect before buying  
 
 (Local AI available with Ollama)
 """
