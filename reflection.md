@@ -1,14 +1,15 @@
 ## Reflection
 
-This project simulates a real automotive marketplace using synthetic data.
+This project simulates a real-world automotive marketplace.
 
 Key challenges:
-- dataset realism
-- integrating AI reasoning
+- Creating realistic data
+- Integrating AI without APIs
 
 Solution:
-- structured dataset + scoring system
+- Synthetic dataset with anomalies
+- AI reasoning using Ollama
 
-Future work:
-- real API integration
-- ML pricing prediction
+Future improvements:
+- Real API integration
+- Machine learning pricing model
