@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import os
+import ast
 
 @st.cache_data
 def load_data():
@@ -10,6 +11,7 @@ def load_data():
 
     df = pd.read_csv("data/cars.csv")
 
+    df["images"] = df["images"].apply(ast.literal_eval)
     df["model"] = df["manufacturer"] + " " + df["model"]
     df["mileage"] = df["odometer"]
 
@@ -17,18 +19,12 @@ def load_data():
 
 def filter_cars(cars, query, max_price, fuel):
     query = query.lower()
-    results = []
-
-    for c in cars:
-        if c["price"] > max_price:
-            continue
-        if query and query not in c["model"].lower():
-            continue
-        if fuel != "Any" and c["fuel"] != fuel:
-            continue
-        results.append(c)
-
-    return results
+    return [
+        c for c in cars
+        if c["price"] <= max_price
+        and (query in c["model"].lower())
+        and (fuel == "Any" or c["fuel"] == fuel)
+    ]
 
 def analyze_cars(cars):
     for c in cars:
