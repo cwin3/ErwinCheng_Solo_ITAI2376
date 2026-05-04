@@ -1,32 +1,9 @@
 import streamlit as st
 from src.tools import load_data, filter_cars, analyze_cars
 from src.ollama_agent import ask_ollama
-from generated_dataset import generate_dataset
 import pandas as pd
 
 st.set_page_config(layout="wide")
-
-# ---------- SAFE IMAGE FUNCTION ----------
-def get_safe_image(c):
-    fallback = "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"
-
-    try:
-        image = c.get("images")
-
-        # Case 1: list
-        if isinstance(image, list):
-            for img in image:
-                if isinstance(img, str) and img.startswith("http"):
-                    return img
-
-        # Case 2: string
-        if isinstance(image, str) and image.startswith("http"):
-            return image
-
-    except:
-        pass
-
-    return fallback
 
 # ---------- STYLE ----------
 st.markdown("""
@@ -112,19 +89,17 @@ if st.session_state.search_clicked:
     for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
 
-            # ---------- SAFE IMAGE ----------
-           try:
-                st.image(get_safe_image(c), use_container_width=True)
-            except:
-                st.image(
-                    "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg",
-                    use_container_width=True
+            # ✅ GENERIC SAFE IMAGE
+            st.image(
+                "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg",
+                use_container_width=True
             )
+
             # ---------- TEXT ----------
             st.markdown(f"### {c.get('model','Unknown')} {c.get('year','')}")
             st.markdown(f"<div class='price'>${c.get('price',0):,}</div>", unsafe_allow_html=True)
             st.markdown(
-                f"<div class='subtle'>{c.get('mileage',0):,} miles • {c.get('fuel','')}</div>",
+                f"<div class='subtle'>{c.get('mileage',0):,} miles • {c.get('fuel','')}",
                 unsafe_allow_html=True
             )
 
