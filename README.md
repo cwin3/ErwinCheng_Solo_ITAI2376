@@ -17,6 +17,8 @@ python generated_dataset.py
 ollama run llama3
 streamlit run app.py
 
+This project simulates an AI agent using decision scoring inspired by machine learning models.
+
 Final Project Structure
 ErwinCheng_Solo_ITAI2376/
 │
