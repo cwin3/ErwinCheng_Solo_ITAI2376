@@ -1,31 +1,6 @@
 import pandas as pd
 import streamlit as st
 import os
-import ast
-
-def safe_parse_images(val):
-    fallback = ["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]
-
-    try:
-        # Case 1: already list
-        if isinstance(val, list):
-            return [str(v) for v in val if isinstance(v, str) and v.startswith("http")] or fallback
-
-        # Case 2: string → try parse
-        if isinstance(val, str):
-            try:
-                parsed = ast.literal_eval(val)
-                if isinstance(parsed, list):
-                    return [str(v) for v in parsed if isinstance(v, str) and v.startswith("http")] or fallback
-            except:
-                if val.startswith("http"):
-                    return [val]
-
-        # Case 3: NaN or bad
-        return fallback
-
-    except:
-        return fallback
 
 @st.cache_data
 def load_data():
@@ -34,18 +9,6 @@ def load_data():
         generate_dataset()
 
     df = pd.read_csv("data/cars.csv")
-
-    # ---------- IMAGE HANDLING ----------
-    if "images" in df.columns:
-        df["images"] = df["images"].apply(safe_parse_images)
-    elif "image" in df.columns:
-        df["images"] = df["image"].apply(lambda x: [x])
-    else:
-        df["images"] = [["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]] * len(df)
-
-    # ---------- DEALER LOGO ----------
-    if "dealer_logo" not in df.columns:
-        df["dealer_logo"] = "https://cdn-icons-png.flaticon.com/512/743/743007.png"
 
     df["model"] = df["manufacturer"] + " " + df["model"]
     df["mileage"] = df["odometer"]
@@ -60,16 +23,12 @@ def filter_cars(cars, query, max_price, fuel, brand=None, model=None):
     for c in cars:
         if c["price"] > max_price:
             continue
-
-        if brand and brand != "All" and c["manufacturer"] != brand:
+        if brand != "All" and c["manufacturer"] != brand:
             continue
-
-        if model and model != "All" and c["model"] != model:
+        if model != "All" and c["model"] != model:
             continue
-
         if query and query not in c["model"].lower():
             continue
-
         if fuel != "Any" and c["fuel"] != fuel:
             continue
 
