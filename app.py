@@ -19,7 +19,7 @@ st.title("🚗 Find Your Next Car")
 # ---------- LOAD DATA ----------
 cars_data = load_data()
 
-# ---------- BRAND & MODEL EXTRACTION ----------
+# ---------- BRAND / MODEL ----------
 brands = sorted(list(set([c["manufacturer"] for c in cars_data])))
 
 models_by_brand = {}
@@ -66,12 +66,19 @@ if query or selected_brand != "All" or selected_model != "All":
 
     cars = analyze_cars(cars)
 
-    # ---------- DISPLAY ----------
     cols = st.columns(3)
 
     for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
-            st.image(c["images"][0], use_container_width=True)
+
+            # SAFE IMAGE HANDLING
+            image = c.get("images", ["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"])
+
+            if isinstance(image, list) and len(image) > 0:
+                st.image(image[0], use_container_width=True)
+            else:
+                st.image("https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg", use_container_width=True)
+
             st.markdown(f"### {c['model']} {c['year']}")
             st.markdown(f"<div class='price'>${c['price']:,}</div>", unsafe_allow_html=True)
             st.markdown(f"<div class='subtle'>{c['mileage']:,} miles • {c['fuel']}</div>", unsafe_allow_html=True)
