@@ -4,9 +4,7 @@
 
 ## Objective
 
-AI-powered car marketplace simulation using a local LLM (Ollama).
-
-This project simulates an AI agent using decision scoring inspired by machine learning models.
+The objective of this project is to design and develop an AI-powered car buying assistant that helps users find the best vehicle options based on their preferences. The system filters and analyzes car listings, highlights good deals, and flags potentially risky listings to support smarter decision-making. This project also demonstrates how AI concepts can be applied to a real-world problem in a simple and practical way.
 
 ---
 
