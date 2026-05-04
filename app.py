@@ -20,11 +20,14 @@ st.title("🚗 Find Your Next Car")
 cars_data = load_data()
 
 # ---------- BRAND / MODEL ----------
-brands = sorted(list(set([c["manufacturer"] for c in cars_data])))
+brands = sorted(list(set([c.get("manufacturer", "") for c in cars_data if c.get("manufacturer")])))
 
 models_by_brand = {}
 for c in cars_data:
-    models_by_brand.setdefault(c["manufacturer"], set()).add(c["model"])
+    brand = c.get("manufacturer")
+    model = c.get("model")
+    if brand and model:
+        models_by_brand.setdefault(brand, set()).add(model)
 
 for k in models_by_brand:
     models_by_brand[k] = sorted(list(models_by_brand[k]))
@@ -37,9 +40,9 @@ with col1:
 
 with col2:
     if selected_brand != "All":
-        model_options = models_by_brand[selected_brand]
+        model_options = models_by_brand.get(selected_brand, [])
     else:
-        model_options = sorted(set([c["model"] for c in cars_data]))
+        model_options = sorted(set([c.get("model", "") for c in cars_data if c.get("model")]))
 
     selected_model = st.selectbox("Model", ["All"] + model_options)
 
@@ -71,26 +74,46 @@ if query or selected_brand != "All" or selected_model != "All":
     for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
 
-            # SAFE IMAGE HANDLING
-            image = c.get("images", ["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"])
+            # ---------- ✅ SAFE IMAGE FIX (THIS FIXES YOUR ERROR) ----------
+            image = c.get("images")
 
-            if isinstance(image, list) and len(image) > 0:
+            if (
+                isinstance(image, list)
+                and len(image) > 0
+                and isinstance(image[0], str)
+                and image[0].startswith("http")
+            ):
                 st.image(image[0], use_container_width=True)
             else:
-                st.image("https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg", use_container_width=True)
+                st.image(
+                    "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg",
+                    use_container_width=True
+                )
 
-            st.markdown(f"### {c['model']} {c['year']}")
-            st.markdown(f"<div class='price'>${c['price']:,}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='subtle'>{c['mileage']:,} miles • {c['fuel']}</div>", unsafe_allow_html=True)
+            # ---------- TEXT ----------
+            st.markdown(f"### {c.get('model','Unknown')} {c.get('year','')}")
+            st.markdown(f"<div class='price'>${c.get('price',0):,}</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='subtle'>{c.get('mileage',0):,} miles • {c.get('fuel','')}</div>",
+                unsafe_allow_html=True
+            )
 
-            st.image(c["dealer_logo"], width=80)
-            st.caption(c["dealer"])
+            # ---------- DEALER ----------
+            dealer_logo = c.get("dealer_logo")
 
-            if c["is_suspicious"]:
+            if isinstance(dealer_logo, str) and dealer_logo.startswith("http"):
+                st.image(dealer_logo, width=80)
+            else:
+                st.image("https://cdn-icons-png.flaticon.com/512/743/743007.png", width=80)
+
+            st.caption(c.get("dealer","Unknown Dealer"))
+
+            # ---------- DEAL STATUS ----------
+            if c.get("is_suspicious"):
                 st.error("⚠️ Suspicious Listing")
-            elif c["score"] > 70:
+            elif c.get("score", 0) > 70:
                 st.success("🔥 Excellent Deal")
-            elif c["score"] > 50:
+            elif c.get("score", 0) > 50:
                 st.info("👍 Good Deal")
             else:
                 st.warning("💸 Overpriced")
@@ -98,7 +121,8 @@ if query or selected_brand != "All" or selected_model != "All":
 # ---------- INSIGHTS ----------
 if cars:
     df = pd.DataFrame(cars)
-    st.write("Average Price:", int(df["price"].mean()))
+    if "price" in df.columns:
+        st.write("Average Price:", int(df["price"].mean()))
 
 # ---------- AI ----------
 st.markdown("### 🤖 AI Insights")
