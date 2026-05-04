@@ -4,24 +4,23 @@ import uuid
 import string
 import os
 
-os.makedirs("data", exist_ok=True)
-
-brands_models = {
-    "Toyota": ["Camry", "Corolla", "RAV4"],
-    "Honda": ["Civic", "Accord", "CR-V"],
-    "Ford": ["F-150", "Escape", "Explorer"],
-    "BMW": ["3 Series", "5 Series", "X5"],
-    "Mercedes-Benz": ["C-Class", "E-Class", "GLE"]
-}
-
-dealers = ["CarMax", "AutoNation", "DriveTime", "Elite Motors"]
-
-cities = [("Houston","TX"),("Los Angeles","CA"),("Chicago","IL"),("New York","NY")]
-
 def generate_vin():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=17))
 
 def generate_dataset(n=10000):
+    os.makedirs("data", exist_ok=True)
+
+    brands_models = {
+        "Toyota": ["Camry", "Corolla", "RAV4"],
+        "Honda": ["Civic", "Accord", "CR-V"],
+        "Ford": ["F-150", "Escape", "Explorer"],
+        "BMW": ["3 Series", "5 Series", "X5"],
+        "Mercedes-Benz": ["C-Class", "E-Class", "GLE"]
+    }
+
+    dealers = ["CarMax", "AutoNation", "DriveTime", "Elite Motors"]
+    cities = [("Houston","TX"),("Los Angeles","CA"),("Chicago","IL"),("New York","NY")]
+
     data = []
 
     for _ in range(n):
@@ -66,5 +65,7 @@ def generate_dataset(n=10000):
     df = pd.DataFrame(data)
     df.to_csv("data/cars.csv", index=False)
 
-generate_dataset()
-print("Dataset generated successfully.")
+    print("Dataset ready: data/cars.csv")
+
+if __name__ == "__main__":
+    generate_dataset()
