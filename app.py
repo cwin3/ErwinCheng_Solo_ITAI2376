@@ -9,15 +9,22 @@ st.set_page_config(layout="wide")
 # ---------- SAFE IMAGE FUNCTION ----------
 def get_safe_image(c):
     fallback = "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"
-    image = c.get("images")
 
-    if isinstance(image, list) and len(image) > 0:
-        first = image[0]
-        if isinstance(first, str) and first.startswith("http"):
-            return first
+    try:
+        image = c.get("images")
 
-    if isinstance(image, str) and image.startswith("http"):
-        return image
+        # Case 1: list
+        if isinstance(image, list):
+            for img in image:
+                if isinstance(img, str) and img.startswith("http"):
+                    return img
+
+        # Case 2: string
+        if isinstance(image, str) and image.startswith("http"):
+            return image
+
+    except:
+        pass
 
     return fallback
 
