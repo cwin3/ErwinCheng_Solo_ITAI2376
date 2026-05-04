@@ -113,8 +113,13 @@ if st.session_state.search_clicked:
         with cols[i % 3]:
 
             # ---------- SAFE IMAGE ----------
-            st.image(get_safe_image(c), use_container_width=True)
-
+           try:
+                st.image(get_safe_image(c), use_container_width=True)
+            except:
+                st.image(
+                    "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg",
+                    use_container_width=True
+            )
             # ---------- TEXT ----------
             st.markdown(f"### {c.get('model','Unknown')} {c.get('year','')}")
             st.markdown(f"<div class='price'>${c.get('price',0):,}</div>", unsafe_allow_html=True)
