@@ -5,6 +5,20 @@ import pandas as pd
 
 st.set_page_config(layout="wide")
 
+# ---------- BRAND LOGO FUNCTION ----------
+def get_brand_logo(brand):
+    logos = {
+        "Toyota": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_carlogo.svg",
+        "Honda": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg",
+        "Ford": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg",
+        "BMW": "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg",
+        "Mercedes-Benz": "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg"
+    }
+    return logos.get(
+        brand,
+        "https://cdn-icons-png.flaticon.com/512/743/743007.png"
+    )
+
 # ---------- STYLE ----------
 st.markdown("""
 <style>
@@ -54,7 +68,7 @@ query = st.text_input("Search cars (optional)")
 if "search_clicked" not in st.session_state:
     st.session_state.search_clicked = False
 
-colA, colB = st.columns([1,1])
+colA, colB = st.columns([1, 1])
 
 with colA:
     if st.button("🔍 Search"):
@@ -85,12 +99,9 @@ if st.session_state.search_clicked:
     for i, c in enumerate(cars[:9]):
         with cols[i % 3]:
 
-            # ✅ ONLINE GENERIC IMAGE (SAFE)
+            # ✅ BRAND LOGO IMAGE (SAFE)
             try:
-                st.image(
-                    "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg",
-                    use_container_width=True
-                )
+                st.image(get_brand_logo(c["manufacturer"]), width=120)
             except:
                 st.write("🚗")
 
