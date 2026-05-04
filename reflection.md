@@ -2,67 +2,65 @@
 
 ## What Worked Well
 
-The main parts of the project worked really well. The app can load data, filter cars based on user preferences, and show results in a clean and simple way. The deal scoring system was especially useful because it helped highlight which cars are actually good deals instead of just showing a list.
+The core functionality of the Smart Car Finder worked really well. The app can filter cars based on user preferences like brand, model, price, and fuel type, and it presents results in a clean and easy-to-understand format.
 
-The filters (brand, model, price, fuel) made the app feel more like a real car marketplace, and the overall flow is easy to understand.
+One of the strongest parts of the project is the deal scoring system. It helps users quickly identify which cars are good deals and which ones might be overpriced or risky. The fraud detection feature also adds realism by flagging suspicious listings.
+
+Another thing that worked well is the hybrid AI system. The app is designed to handle simple queries locally while using a more advanced cloud model for complex questions. This makes the system both efficient and flexible.
 
 ---
 
 ## What Didn’t Work at First
 
-There were definitely some issues along the way.
+There were several challenges during development.
 
-The biggest problems were:
-- images breaking the app
-- trying to use Ollama (local AI) on Streamlit Cloud
-- deployment errors that didn’t show clear messages
+At first, image handling caused frequent crashes because of inconsistent data formats. Also, trying to use Ollama alone did not work in Streamlit Cloud since it requires a local environment. Deployment issues were difficult because error messages were not always clear.
 
-These things caused a lot of debugging and forced me to simplify parts of the project.
+These problems forced me to simplify parts of the design and make the system more robust.
 
 ---
 
-## Biggest Challenge
+## Biggest Technical Challenge
 
-The hardest part was making everything work in the cloud.
+The biggest challenge was building an AI system that works both locally and in the cloud.
 
-At first, I tried to use dynamic images and a real local AI model, but both caused crashes when deploying. I had to step back and rethink the design to make it more stable.
+Initially, I tried to rely only on a local model (Ollama), but it failed in deployment. To solve this, I redesigned the system into a hybrid approach:
 
-In the end, I:
-- switched to simple, reliable images
-- replaced the real AI with a simulated version
+- OpenAI handles more complex queries
+- Ollama handles simple queries locally
+- A fallback response ensures the app never crashes
 
-That made the app much more stable and easier to run.
+This approach made the system much more reliable and closer to how real-world AI systems are designed.
 
 ---
 
 ## Changes from My Original Plan
 
-Originally, I planned to use a real AI model (like Ollama) for responses. But since it doesn’t work in Streamlit Cloud, I had to switch to a simulated AI assistant.
+In my original plan, I intended to use a single AI model for all tasks. However, due to deployment limitations, I changed the design to a hybrid system.
 
-Even though it’s simulated, the system still follows the same idea:
-- user gives input
-- system processes data
-- system gives helpful output
+Even though the implementation changed, the core idea stayed the same:
+- user input → processing → intelligent output
 
-So the core concept stayed the same.
+The new hybrid system actually improved the project by making it more realistic and robust.
 
 ---
 
 ## What I Would Improve Next
 
-If I had more time, I would:
+If I continued working on this project, I would:
 
-- connect to real car listing APIs (like Auto.dev or MarketCheck) but need to invest some money into this. no more free data available
-- use a real AI model (OpenAI or similar) also need to invest money into this.
-- improve the scoring system using machine learning
-- add personalized recommendations
+- Use real car listing APIs (Auto.dev, MarketCheck)
+- Train a machine learning model for pricing instead of using rules
+- Improve the AI assistant to give more personalized recommendations
+- Add user accounts and saved preferences
+- Enhance the UI to look closer to real marketplaces like CarMax
 
 ---
 
 ## Final Thoughts
 
-This project helped me understand how AI concepts can actually be used in a real application. It’s one thing to learn about AI, but building something that simulates decision-making makes it much clearer.
+This project helped me understand how AI concepts can be applied in a practical way. Instead of just learning theory, I was able to build something that simulates real decision-making.
 
-Even though the system is simplified, it shows how AI can help users make better choices, especially in this scenario like buying a car.
+The hybrid AI approach was a big learning moment because it showed how real systems balance performance, cost, and reliability.
 
-Overall, I’m happy with how it turned out, especially after fixing all the deployment issues.
+Overall, the project demonstrates how AI can help users make better decisions when buying a car, even with a simplified implementation.
