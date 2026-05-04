@@ -4,8 +4,9 @@ def ask_ollama(prompt):
     try:
         res = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model":"llama3","prompt":prompt,"stream":False}
+            json={"model":"llama3","prompt":prompt,"stream":False},
+            timeout=5
         )
         return res.json()["response"]
     except:
-        return "⚠️ Ollama not running. Start it with: ollama run llama3"
+        return "⚠️ AI unavailable on cloud. Run locally with Ollama."
