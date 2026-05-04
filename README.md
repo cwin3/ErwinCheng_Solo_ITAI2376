@@ -30,52 +30,72 @@ Even though the deployed version uses a simplified AI response for stability, th
 
 ---
 
-How to choose Agent Framework.pdf
-PDF
-ITAI_2376_Midterm_Final_Project_Specs.pdf
-PDF
-OVERVIEW
+### 1. Transformer-Based AI (Hybrid Approach)
 
-Your midterm is a design document — a blueprint for the AI agent you will build for the final. You are not building anything yet. You are planning, researching, and showing me that you understand how the deep learning concepts we have covered connect to real-world AI agent applications.
+The AI assistant in this system is inspired by Transformer-based models like GPT. The application uses a hybrid approach:
 
-This blueprint becomes the foundation for your Final Project (due May 3).
+- Simple queries are handled locally (Ollama)
+- More complex queries are handled by a cloud-based model (OpenAI)
+- A fallback response ensures the system always remains stable
 
+This setup reflects how real-world AI systems often balance performance, cost, and reliability by combining local and cloud models.
 
-CHOOSE YOUR PATH
+Transformer models are powerful because they can:
+- understand natural language
+- compare multiple options
+- generate helpful recommendations
 
-• Option A — Single AI Agent: Plan one agent that uses deep learning to perceive, reason, and act on a real-world task.
-
-
-Declare which option you are choosing and explain why.
-
-
-WHAT TO INCLUDE IN YOUR BLUEPRINT (3–6 pages)
-
-1. Problem Statement — What real-world problem does your agent solve? Who benefits?
-2. Option Choice — Which option (A ) and why.
-3. Agent Architecture — A diagram showing inputs, reasoning, actions, and tools. Label everything.
-4. Deep Learning Connection — Identify at least 2 course modules (CNNs, RNNs, Transformers, VAEs, GANs, etc.) and explain how they fit into your agent.
-5. Agent Framework — Which framework you plan to use (LangChain, CrewAI, AutoGen, smolagents, or other) and why.
-6. Tools & Data — What tools, APIs, and data sources will your agent need?
-7. Build Plan — A week-by-week timeline from midterm to final due date.
-8. Anticipated Challenges — What could go wrong and how will you handle it?
+In this project, the AI assistant simulates these capabilities by guiding users in selecting the best car based on their needs.
 
 ---
 
-### Big Picture
+### 2. Feature-Based Scoring (Model-Like Behavior)
 
-Overall, this project shows how AI concepts like:
-- decision-making
-- feature evaluation
-- anomaly detection
-- and language-based guidance
+The system includes a deal scoring function that evaluates each car using features such as:
 
-can be applied to a real-world problem like buying a car.
+- price
+- mileage
+- listing type (normal, overpriced, suspicious)
 
-Even though the AI is simplified, the structure reflects how real AI systems are designed.
+Cars with lower price and mileage receive higher scores, while suspicious listings are penalized.
+
+This approach is similar to how machine learning models use multiple features to make predictions or recommendations. In a real implementation, this could be replaced with a trained neural network or regression model that predicts fair market value.
+
+---
+
+### 3. Anomaly Detection (Fraud Detection)
+
+The app flags suspicious listings using rule-based logic that mimics anomaly detection.
+
+In real AI systems, anomaly detection is often handled using:
+- autoencoders
+- isolation forests
+- classification models trained on fraud data
+
+Although simplified, this feature demonstrates how AI can help users avoid risky or fraudulent options.
+
+---
+
+### 4. Real-World AI System Design
+
+This project reflects key ideas used in real AI systems:
+
+- combining multiple models (local + cloud)
+- using structured data for decision-making
+- supporting users with intelligent recommendations
+
+Even though the implementation is simplified, it shows how deep learning concepts can be applied to a practical problem like car buying.
+
+---
+
+### Summary
+
+Overall, this project demonstrates how AI can enhance user decision-making by combining filtering, scoring, and language-based guidance. The hybrid AI approach makes the system both realistic and reliable, while still reflecting how modern deep learning systems operate.
+
+---
 
 
-Final Project Structure
+### Final Project Structure
 ErwinCheng_Solo_ITAI2376/
 │
 ├── app.py
