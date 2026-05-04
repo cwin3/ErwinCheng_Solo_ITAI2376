@@ -7,6 +7,23 @@ import os
 def generate_vin():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=17))
 
+def get_car_images(brand, model):
+    base = f"https://source.unsplash.com/featured/?{brand},{model},car"
+    return [
+        base,
+        f"https://source.unsplash.com/featured/?{brand},{model},interior",
+        f"https://source.unsplash.com/featured/?{brand},{model},dashboard"
+    ]
+
+def get_dealer_logo(dealer):
+    logos = {
+        "CarMax": "https://upload.wikimedia.org/wikipedia/commons/4/4b/CarMax_Logo.png",
+        "AutoNation": "https://upload.wikimedia.org/wikipedia/commons/3/3b/AutoNation_logo.svg",
+        "DriveTime": "https://upload.wikimedia.org/wikipedia/commons/5/5c/DriveTime_logo.png",
+        "Elite Motors": "https://cdn-icons-png.flaticon.com/512/743/743007.png"
+    }
+    return logos.get(dealer, logos["CarMax"])
+
 def generate_dataset(n=10000):
     os.makedirs("data", exist_ok=True)
 
@@ -26,15 +43,13 @@ def generate_dataset(n=10000):
     for _ in range(n):
         brand = random.choice(list(brands_models))
         model = random.choice(brands_models[brand])
-        year = random.randint(2010, 2023)
+        dealer = random.choice(dealers)
 
+        year = random.randint(2010, 2023)
         price = random.randint(12000, 60000)
         mileage = random.randint(5000, 120000)
 
-        listing_type = random.choices(
-            ["normal","great_deal","overpriced","fraud"],
-            weights=[0.7,0.1,0.1,0.1]
-        )[0]
+        listing_type = random.choice(["normal","great_deal","overpriced","fraud"])
 
         if listing_type == "great_deal":
             price *= 0.7
@@ -54,18 +69,15 @@ def generate_dataset(n=10000):
             "price": int(price),
             "odometer": mileage,
             "fuel": random.choice(["gas","hybrid","electric"]),
-            "transmission": random.choice(["automatic","manual"]),
-            "dealer": random.choice(dealers),
+            "dealer": dealer,
+            "dealer_logo": get_dealer_logo(dealer),
             "city": city,
             "state": state,
             "listing_type": listing_type,
-            "image": "https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"
+            "images": get_car_images(brand, model)
         })
 
-    df = pd.DataFrame(data)
-    df.to_csv("data/cars.csv", index=False)
-
-    print("Dataset ready: data/cars.csv")
+    pd.DataFrame(data).to_csv("data/cars.csv", index=False)
 
 if __name__ == "__main__":
     generate_dataset()
