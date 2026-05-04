@@ -1,8 +1,13 @@
 import pandas as pd
 import streamlit as st
+import os
 
 @st.cache_data
 def load_data():
+    if not os.path.exists("data/cars.csv"):
+        from generated_dataset import generate_dataset
+        generate_dataset()
+
     df = pd.read_csv("data/cars.csv")
 
     df["model"] = df["manufacturer"] + " " + df["model"]
