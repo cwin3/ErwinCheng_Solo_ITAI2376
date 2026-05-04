@@ -4,21 +4,28 @@ import os
 import ast
 
 def safe_parse_images(val):
-    try:
-        if isinstance(val, list):
-            return val
+    fallback = ["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]
 
+    try:
+        # Case 1: already list
+        if isinstance(val, list):
+            return [str(v) for v in val if isinstance(v, str) and v.startswith("http")] or fallback
+
+        # Case 2: string → try parse
         if isinstance(val, str):
-            parsed = ast.literal_eval(val)
-            if isinstance(parsed, list):
-                return parsed
-            else:
-                return [val]
+            try:
+                parsed = ast.literal_eval(val)
+                if isinstance(parsed, list):
+                    return [str(v) for v in parsed if isinstance(v, str) and v.startswith("http")] or fallback
+            except:
+                if val.startswith("http"):
+                    return [val]
+
+        # Case 3: NaN or bad
+        return fallback
 
     except:
-        pass
-
-    return ["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]
+        return fallback
 
 @st.cache_data
 def load_data():
