@@ -5,19 +5,22 @@ import pandas as pd
 
 st.set_page_config(page_title="Car Finder", layout="wide")
 
+st.title("🚗 Smart Car Finder")
+
 if "favorites" not in st.session_state:
     st.session_state.favorites = []
 
 cars_data = load_data()
 
 # Sidebar
-st.sidebar.title("Filters")
+st.sidebar.header("Filters")
 budget = st.sidebar.slider("Max Price", 5000, 80000, 25000)
 fuel = st.sidebar.selectbox("Fuel Type", ["Any","gas","hybrid","electric"])
 sort_by = st.sidebar.radio("Sort By", ["Best","Cheapest","Newest"])
 
-# Search
-query = st.text_input("Search cars (e.g. Toyota, BMW)")
+query = st.text_input("Search cars (Toyota, BMW, SUV...)")
+
+cars = []
 
 if query:
     cars = filter_cars(cars_data, query, budget, fuel)
@@ -30,7 +33,7 @@ if query:
     else:
         cars.sort(key=lambda x: x["year"], reverse=True)
 
-    st.markdown("## Results")
+    st.subheader("Results")
     cols = st.columns(3)
 
     for i, c in enumerate(cars[:9]):
@@ -39,23 +42,23 @@ if query:
             st.write(f"**{c['model']} ({c['year']})**")
             st.write(f"${c['price']:,}")
             st.write(f"{c['mileage']:,} miles")
-            st.write(f"{c['dealer']}")
+            st.write(c["dealer"])
 
             if c["is_suspicious"]:
                 st.error("⚠️ Suspicious listing")
             elif c["score"] > 70:
-                st.success(f"Excellent Deal ({c['score']})")
+                st.success(f"🔥 Excellent Deal ({c['score']})")
             elif c["score"] > 50:
-                st.warning(f"Good Deal ({c['score']})")
+                st.warning(f"👍 Good Deal ({c['score']})")
             else:
-                st.warning(f"Overpriced ({c['score']})")
+                st.warning(f"💸 Overpriced ({c['score']})")
 
             if st.button("❤️ Save", key=f"save_{i}"):
                 st.session_state.favorites.append(c)
 
 # Compare
 st.markdown("---")
-st.markdown("## Compare")
+st.subheader("Compare")
 
 if len(st.session_state.favorites) >= 2:
     cols = st.columns(len(st.session_state.favorites[:3]))
@@ -67,16 +70,15 @@ if len(st.session_state.favorites) >= 2:
 
 # AI Assistant
 st.markdown("---")
-st.markdown("## Ask AI")
+st.subheader("Ask AI")
 
 chat = st.text_input("Ask about cars...")
 
 if chat:
-    response = ask_ollama(chat)
-    st.write(response)
+    st.write(ask_ollama(chat))
 
 # Insights
 if query and len(cars) > 0:
     df = pd.DataFrame(cars)
-    st.markdown("## Market Insights")
+    st.subheader("Market Insights")
     st.write("Average Price:", int(df["price"].mean()))
