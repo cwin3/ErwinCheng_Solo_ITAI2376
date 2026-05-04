@@ -11,7 +11,17 @@ def load_data():
 
     df = pd.read_csv("data/cars.csv")
 
-    df["images"] = df["images"].apply(ast.literal_eval)
+    # ✅ FALLBACK HANDLING (CRITICAL FIX)
+    if "images" in df.columns:
+        df["images"] = df["images"].apply(ast.literal_eval)
+    elif "image" in df.columns:
+        df["images"] = df["image"].apply(lambda x: [x])
+    else:
+        df["images"] = [["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]] * len(df)
+
+    if "dealer_logo" not in df.columns:
+        df["dealer_logo"] = "https://cdn-icons-png.flaticon.com/512/743/743007.png"
+
     df["model"] = df["manufacturer"] + " " + df["model"]
     df["mileage"] = df["odometer"]
 
@@ -22,7 +32,7 @@ def filter_cars(cars, query, max_price, fuel):
     return [
         c for c in cars
         if c["price"] <= max_price
-        and (query in c["model"].lower())
+        and query in c["model"].lower()
         and (fuel == "Any" or c["fuel"] == fuel)
     ]
 
