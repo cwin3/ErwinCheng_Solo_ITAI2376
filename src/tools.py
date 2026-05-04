@@ -3,6 +3,23 @@ import streamlit as st
 import os
 import ast
 
+def safe_parse_images(val):
+    try:
+        if isinstance(val, list):
+            return val
+
+        if isinstance(val, str):
+            parsed = ast.literal_eval(val)
+            if isinstance(parsed, list):
+                return parsed
+            else:
+                return [val]
+
+    except:
+        pass
+
+    return ["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]
+
 @st.cache_data
 def load_data():
     if not os.path.exists("data/cars.csv"):
@@ -11,15 +28,15 @@ def load_data():
 
     df = pd.read_csv("data/cars.csv")
 
-    # ---------- IMAGE FALLBACK ----------
+    # ---------- IMAGE HANDLING ----------
     if "images" in df.columns:
-        df["images"] = df["images"].apply(ast.literal_eval)
+        df["images"] = df["images"].apply(safe_parse_images)
     elif "image" in df.columns:
         df["images"] = df["image"].apply(lambda x: [x])
     else:
         df["images"] = [["https://cdn.pixabay.com/photo/2012/05/29/00/43/car-49278_1280.jpg"]] * len(df)
 
-    # ---------- DEALER LOGO FALLBACK ----------
+    # ---------- DEALER LOGO ----------
     if "dealer_logo" not in df.columns:
         df["dealer_logo"] = "https://cdn-icons-png.flaticon.com/512/743/743007.png"
 
